@@ -109,7 +109,7 @@ const renderRoasts = () => {
 };
 
 const addRoast = (complaint, notes) => {
-  const roastLine = pickRandomRoast();
+  const roastLine = `${pickRandomRoast()}${complaint ? ` ｜ 你的抱怨：“${complaint}”` : ""}`;
   const newEntry = {
     id: createId(),
     roast: roastLine,
@@ -123,20 +123,29 @@ const addRoast = (complaint, notes) => {
   renderRoasts();
 };
 
-const simulateRoastRequest = (complaint, notes) => {
+const setInteractionState = (isLoading) => {
+  roastButton.disabled = isLoading;
+  loadSampleButton.disabled = isLoading;
+  clearAllButton.disabled = isLoading;
+  roastButton.textContent = isLoading ? "Roasting..." : "Roast Me! (求骂醒)";
+};
+
+const simulateRoastRequest = async (complaint, notes) => {
   networkStatus.textContent = "AI 正在酝酿毒舌，稍等片刻...";
-  roastButton.disabled = true;
-  roastButton.textContent = "生成中...";
-  loadSampleButton.disabled = true;
-  clearAllButton.disabled = true;
+  setInteractionState(true);
+
+  try {
+    await fetch("https://jsonplaceholder.typicode.com/todos/1");
+    networkStatus.textContent = "网络畅通，AI 正在思考如何毒舌...";
+  } catch (error) {
+    console.warn("Network flaky, proceeding with roast", error);
+    networkStatus.textContent = "网络有点不稳，但毒舌照常进行...";
+  }
 
   setTimeout(() => {
     addRoast(complaint, notes);
     networkStatus.innerHTML = '<span class="badge">完成</span> 最新毒舌已加入历史';
-    roastButton.disabled = false;
-    loadSampleButton.disabled = false;
-    clearAllButton.disabled = false;
-    roastButton.textContent = "Roast Me! (求骂醒)";
+    setInteractionState(false);
     taskForm.reset();
     titleInput.focus();
   }, 1000);
@@ -192,7 +201,11 @@ const init = () => {
     event.preventDefault();
     const complaint = titleInput.value.trim();
     const notes = notesInput.value.trim();
-    if (!complaint) return;
+    if (!complaint) {
+      networkStatus.textContent = "请先输入你的槽点，再让 AI 开炮。";
+      titleInput.focus();
+      return;
+    }
     simulateRoastRequest(complaint, notes);
   });
 

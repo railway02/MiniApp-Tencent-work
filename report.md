@@ -16,12 +16,12 @@
 graph TD
   UI[Index.html\n表单 / 列表] --> Logic
   Logic[app.js\n状态与事件控制] --> Storage[(localStorage\n持久化)]
-  Logic --> Network[(setTimeout\n模拟网络生成)]
+  Logic --> Network[(fetch + setTimeout\n模拟网络生成)]
   Logic --> Render[DOM 渲染\n模板克隆]
 ```
 
 ## 4. 技术亮点及实现原理
-- **网络模拟**：通过 `setTimeout` 施加 1 秒延迟，模拟云端 AI 生成过程，并在按钮与状态文本上呈现 Loading/完成态。
+- **网络模拟**：通过 `fetch` 请求 + `setTimeout` 施加 1 秒延迟，模拟云端 AI 生成过程，并在按钮与状态文本上呈现 Loading/完成态。
 - **随机毒舌库**：预置 `ROAST_LIBRARY`，每次请求随机抽取一句生成，确保结果与输入解耦但体验丰富。
 - **本地持久化**：使用 `localStorage` 存储历史，初始化时解析到内存，后续 CRUD 实时写入。
 - **组件化渲染**：利用 `<template>` 元素克隆列表卡片，局部更新统计卡与视图，保持交互流畅。
