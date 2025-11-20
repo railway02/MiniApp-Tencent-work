@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusFlow Mini App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content">
+      <p class="eyebrow">MINI APP</p>
+      <h1>FocusFlow</h1>
+      <p class="lede">轻量级待办助手，支持云端样例同步与本地持久化。</p>
+      <div class="hero__stats">
+        <div class="stat">
+          <p class="label">总任务</p>
+          <p class="value" id="totalCount">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">已完成</p>
+          <p class="value" id="completedCount">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">进行中</p>
+          <p class="value" id="activeCount">0</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="createHeading">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">新建任务</p>
+          <h2 id="createHeading">快速记录</h2>
+        </div>
+        <button class="ghost" id="clearAll" type="button">清空本地</button>
+      </div>
+      <form id="taskForm" class="form" autocomplete="off">
+        <label class="field">
+          <span>标题</span>
+          <input id="title" name="title" type="text" placeholder="写下今天最重要的一件事" required>
+        </label>
+        <label class="field">
+          <span>备注</span>
+          <textarea id="notes" name="notes" rows="3" placeholder="补充截止时间、资源链接或灵感"></textarea>
+        </label>
+        <div class="form__actions">
+          <button class="primary" type="submit">保存到本地</button>
+          <button class="secondary" type="button" id="loadSample">同步云端样例</button>
+        </div>
+      </form>
+      <p class="helper" id="networkStatus" role="status">点击“同步云端样例”体验网络请求</p>
+    </section>
+
+    <section class="panel" aria-labelledby="listHeading">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">任务列表</p>
+          <h2 id="listHeading">状态总览</h2>
+        </div>
+        <div class="filter">
+          <label class="checkbox">
+            <input type="checkbox" id="toggleCompleted">
+            <span>隐藏已完成</span>
+          </label>
+        </div>
+      </div>
+      <ul class="list" id="taskList" aria-live="polite"></ul>
+      <p class="helper">所有任务实时保存在本地存储，刷新页面不会丢失。</p>
+    </section>
+  </main>
+
+  <template id="taskTemplate">
+    <li class="card">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow" data-created></p>
+          <h3 data-title></h3>
+        </div>
+        <div class="card__actions">
+          <label class="checkbox">
+            <input type="checkbox" data-complete>
+            <span>完成</span>
+          </label>
+          <button class="ghost" type="button" data-delete aria-label="删除任务">删除</button>
+        </div>
+      </div>
+      <p class="card__notes" data-notes></p>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
