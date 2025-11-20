@@ -1,5 +1,16 @@
-const STORAGE_KEY = "focusflow.tasks";
-const API_URL = "https://jsonplaceholder.typicode.com/todos?_limit=4";
+const STORAGE_KEY = "roastmaster.history";
+const ROAST_LIBRARY = [
+  "Is that all you got?",
+  "Your procrastination is an art form.",
+  "Even your excuses are tired.",
+  "Goals fear you’ll never meet them.",
+  "You call that effort? Try again.",
+  "Motivation is filing a missing persons report.",
+  "Your comfort zone has overstay fees.",
+  "Ambition left the chat.",
+  "Hustle? More like gentle stroll.",
+  "Dreams need actions, not naps.",
+];
 
 const taskForm = document.getElementById("taskForm");
 const titleInput = document.getElementById("title");
@@ -10,6 +21,7 @@ const loadSampleButton = document.getElementById("loadSample");
 const toggleCompletedCheckbox = document.getElementById("toggleCompleted");
 const template = document.getElementById("taskTemplate");
 const networkStatus = document.getElementById("networkStatus");
+const roastButton = document.getElementById("roastButton");
 
 const stats = {
   total: document.getElementById("totalCount"),
@@ -19,20 +31,23 @@ const stats = {
 
 const createId = () => crypto.randomUUID();
 
-const loadTasks = () => {
+const pickRandomRoast = () =>
+  ROAST_LIBRARY[Math.floor(Math.random() * ROAST_LIBRARY.length)];
+
+const loadRoasts = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
   } catch (error) {
-    console.error("Failed to parse tasks", error);
+    console.error("Failed to parse roasts", error);
     return [];
   }
 };
 
-let tasks = loadTasks();
+let roasts = loadRoasts();
 
-const persistTasks = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+const persistRoasts = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(roasts));
 };
 
 const formatDate = (timestamp) => {
@@ -43,46 +58,48 @@ const formatDate = (timestamp) => {
 };
 
 const renderStats = () => {
-  const total = tasks.length;
-  const completed = tasks.filter((task) => task.completed).length;
+  const total = roasts.length;
+  const completed = roasts.filter((item) => item.acknowledged).length;
   stats.total.textContent = total;
   stats.completed.textContent = completed;
   stats.active.textContent = total - completed;
 };
 
-const renderTasks = () => {
+const renderRoasts = () => {
   taskList.innerHTML = "";
   const shouldHideCompleted = toggleCompletedCheckbox.checked;
-  const visibleTasks = shouldHideCompleted ? tasks.filter((task) => !task.completed) : tasks;
+  const visibleRoasts = shouldHideCompleted ? roasts.filter((item) => !item.acknowledged) : roasts;
 
-  if (!visibleTasks.length) {
+  if (!visibleRoasts.length) {
     const emptyState = document.createElement("li");
     emptyState.className = "empty";
-    emptyState.textContent = shouldHideCompleted ? "暂无进行中的任务" : "暂时还没有任务，先添加一个吧";
+    emptyState.textContent = shouldHideCompleted ? "暂无待领悟的毒舌" : "暂时还没有毒舌历史，先来一句吧";
     taskList.appendChild(emptyState);
     renderStats();
     return;
   }
 
-  visibleTasks.forEach((task) => {
+  visibleRoasts.forEach((item) => {
     const node = template.content.firstElementChild.cloneNode(true);
-    node.querySelector("[data-title]").textContent = task.title;
-    node.querySelector("[data-notes]").textContent = task.notes || "无备注";
-    node.querySelector("[data-created]").textContent = `创建于 ${formatDate(task.createdAt)}`;
+    node.querySelector("[data-title]").textContent = item.roast;
+    node.querySelector("[data-notes]").textContent = item.complaint
+      ? `你的抱怨：${item.complaint}${item.notes ? ` ｜ 细节：${item.notes}` : ""}`
+      : "无抱怨，AI 自带毒舌";
+    node.querySelector("[data-created]").textContent = `生成于 ${formatDate(item.createdAt)}`;
 
     const checkbox = node.querySelector("[data-complete]");
-    checkbox.checked = task.completed;
+    checkbox.checked = item.acknowledged;
     checkbox.addEventListener("change", () => {
-      task.completed = checkbox.checked;
-      persistTasks();
-      renderTasks();
+      item.acknowledged = checkbox.checked;
+      persistRoasts();
+      renderRoasts();
     });
 
     const deleteButton = node.querySelector("[data-delete]");
     deleteButton.addEventListener("click", () => {
-      tasks = tasks.filter((item) => item.id !== task.id);
-      persistTasks();
-      renderTasks();
+      roasts = roasts.filter((entry) => entry.id !== item.id);
+      persistRoasts();
+      renderRoasts();
     });
 
     taskList.appendChild(node);
@@ -91,72 +108,97 @@ const renderTasks = () => {
   renderStats();
 };
 
-const addTask = (title, notes) => {
-  const newTask = {
+const addRoast = (complaint, notes) => {
+  const roastLine = pickRandomRoast();
+  const newEntry = {
     id: createId(),
-    title,
+    roast: roastLine,
+    complaint,
     notes,
-    completed: false,
+    acknowledged: false,
     createdAt: Date.now(),
   };
-  tasks = [newTask, ...tasks];
-  persistTasks();
-  renderTasks();
+  roasts = [newEntry, ...roasts];
+  persistRoasts();
+  renderRoasts();
 };
 
-const fetchSampleTasks = async () => {
-  networkStatus.textContent = "正在请求云端样例...";
+const simulateRoastRequest = (complaint, notes) => {
+  networkStatus.textContent = "AI 正在酝酿毒舌，稍等片刻...";
+  roastButton.disabled = true;
+  roastButton.textContent = "生成中...";
   loadSampleButton.disabled = true;
-  loadSampleButton.textContent = "同步中...";
-  try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("network error");
-    const data = await response.json();
-    const imported = data.map((item) => ({
+  clearAllButton.disabled = true;
+
+  setTimeout(() => {
+    addRoast(complaint, notes);
+    networkStatus.innerHTML = '<span class="badge">完成</span> 最新毒舌已加入历史';
+    roastButton.disabled = false;
+    loadSampleButton.disabled = false;
+    clearAllButton.disabled = false;
+    roastButton.textContent = "Roast Me! (求骂醒)";
+    taskForm.reset();
+    titleInput.focus();
+  }, 1000);
+};
+
+const loadSampleRoasts = () => {
+  const samples = [
+    {
+      complaint: "周末又想躺平",
+      notes: "还没写完的论文",
+    },
+    { complaint: "健身卡吃灰", notes: "办卡三个月一次没去" },
+    { complaint: "想转行但害怕失败", notes: "每天只看教程不动手" },
+    { complaint: "刷短视频停不下来", notes: "原本想学英语" },
+  ];
+
+  networkStatus.textContent = "正在加载毒舌样例...";
+  loadSampleButton.disabled = true;
+  loadSampleButton.textContent = "加载中...";
+
+  setTimeout(() => {
+    const imported = samples.map((item) => ({
       id: createId(),
-      title: item.title,
-      notes: "来自云端示例任务",
-      completed: item.completed,
+      roast: pickRandomRoast(),
+      complaint: item.complaint,
+      notes: item.notes,
+      acknowledged: false,
       createdAt: Date.now(),
     }));
-    tasks = [...imported, ...tasks];
-    persistTasks();
-    renderTasks();
-    networkStatus.innerHTML = `<span class="badge">完成</span> 已同步 ${imported.length} 条样例数据`;
-  } catch (error) {
-    console.error("Failed to fetch samples", error);
-    networkStatus.textContent = "网络请求失败，请稍后重试。";
-  } finally {
+
+    roasts = [...imported, ...roasts];
+    persistRoasts();
+    renderRoasts();
+    networkStatus.innerHTML = `<span class="badge">完成</span> 已加载 ${imported.length} 条毒舌样例`;
     loadSampleButton.disabled = false;
-    loadSampleButton.textContent = "同步云端样例";
-  }
+    loadSampleButton.textContent = "加载毒舌样例";
+  }, 800);
 };
 
-const clearAllTasks = () => {
-  if (!tasks.length) return;
-  const confirmed = confirm("确认清空本地任务吗？此操作不可撤销。");
+const clearAllRoasts = () => {
+  if (!roasts.length) return;
+  const confirmed = confirm("确认清空毒舌历史吗？此操作不可撤销。");
   if (!confirmed) return;
-  tasks = [];
-  persistTasks();
-  renderTasks();
+  roasts = [];
+  persistRoasts();
+  renderRoasts();
 };
 
 const init = () => {
-  renderTasks();
+  renderRoasts();
 
   taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const title = titleInput.value.trim();
+    const complaint = titleInput.value.trim();
     const notes = notesInput.value.trim();
-    if (!title) return;
-    addTask(title, notes);
-    taskForm.reset();
-    titleInput.focus();
+    if (!complaint) return;
+    simulateRoastRequest(complaint, notes);
   });
 
-  loadSampleButton.addEventListener("click", fetchSampleTasks);
-  clearAllButton.addEventListener("click", clearAllTasks);
-  toggleCompletedCheckbox.addEventListener("change", renderTasks);
+  loadSampleButton.addEventListener("click", loadSampleRoasts);
+  clearAllButton.addEventListener("click", clearAllRoasts);
+  toggleCompletedCheckbox.addEventListener("change", renderRoasts);
 };
 
 init();

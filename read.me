@@ -1,14 +1,14 @@
-# FocusFlow Mini App
+# AI Roast Master Mini App
 
-轻量级待办助手，支持云端样例同步与本地持久化，可直接双击 `index.html` 体验，或在本地启动静态服务器：
+AI 毒舌大师：输入抱怨后模拟 1 秒网络延迟生成随机毒舌，记录到本地存储，双击 `index.html` 即可体验，或在本地启动静态服务器：
 
 ```bash
 python -m http.server 8000
 ```
 
 核心能力：
-- 使用 fetch 网络请求同步示例任务（JSONPlaceholder）。
-- 使用 localStorage 保存任务，刷新不丢失。
-- 模板克隆渲染、完成/删除、过滤视图、统计面板。
+- 使用 `setTimeout` 模拟网络请求，生成毒舌回应。
+- 使用 localStorage 保存毒舌历史，刷新不丢失。
+- 模板克隆渲染、领悟状态切换、过滤视图、统计面板。
 
 更多设计与架构说明见 [`report.md`](report.md)。
