@@ -1,1 +1,14 @@
-mini app
+# AI Roast Master Mini App
+
+AI 毒舌大师：输入抱怨后模拟 1 秒网络延迟生成随机毒舌，记录到本地存储，双击 `index.html` 即可体验，或在本地启动静态服务器：
+
+```bash
+python -m http.server 8000
+```
+
+核心能力：
+- 使用 `fetch` + `setTimeout` 模拟 1 秒网络延迟的云端毒舌回应。
+- 使用 localStorage 保存毒舌历史，刷新不丢失。
+- 模板克隆渲染、领悟状态切换、过滤视图、统计面板。
+
+更多设计与架构说明见 [`report.md`](report.md)。

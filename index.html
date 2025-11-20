@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Roast Master Mini App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__content">
+      <p class="eyebrow">MINI APP</p>
+      <h1>AI Roast Master</h1>
+      <p class="lede">AI 毒舌大师：输入抱怨，云端模拟 1 秒后回敬一句毒舌并持久化存档。</p>
+      <div class="hero__stats">
+        <div class="stat">
+          <p class="label">总毒舌</p>
+          <p class="value" id="totalCount">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">已领悟</p>
+          <p class="value" id="completedCount">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">仍需鞭策</p>
+          <p class="value" id="activeCount">0</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="createHeading">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">提交抱怨</p>
+          <h2 id="createHeading">一键求骂醒</h2>
+        </div>
+        <button class="ghost" id="clearAll" type="button">清空历史</button>
+      </div>
+      <form id="taskForm" class="form" autocomplete="off">
+        <label class="field">
+          <span>抱怨内容</span>
+          <input id="title" name="title" type="text" placeholder="Type your complaint here... (e.g., I don't want to work, I don't want to study)" required>
+        </label>
+        <label class="field">
+          <span>补充场景</span>
+          <textarea id="notes" name="notes" rows="3" placeholder="补充细节，方便 AI 开炮"></textarea>
+        </label>
+        <div class="form__actions">
+          <button class="primary" type="submit" id="roastButton">Roast Me! (求骂醒)</button>
+          <button class="secondary" type="button" id="loadSample">加载毒舌样例</button>
+        </div>
+      </form>
+      <p class="helper" id="networkStatus" role="status">点击“Roast Me! (求骂醒)”体验 1 秒网络延迟生成毒舌</p>
+    </section>
+
+    <section class="panel" aria-labelledby="listHeading">
+      <div class="panel__header">
+        <div>
+          <p class="eyebrow">毒舌列表</p>
+          <h2 id="listHeading">Roast History</h2>
+        </div>
+        <div class="filter">
+          <label class="checkbox">
+            <input type="checkbox" id="toggleCompleted">
+            <span>隐藏已领悟</span>
+          </label>
+        </div>
+      </div>
+      <ul class="list" id="taskList" aria-live="polite"></ul>
+      <p class="helper">所有毒舌历史实时保存在本地存储，刷新页面不会丢失。</p>
+    </section>
+  </main>
+
+  <template id="taskTemplate">
+    <li class="card">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow" data-created></p>
+          <h3 data-title></h3>
+        </div>
+        <div class="card__actions">
+          <label class="checkbox">
+            <input type="checkbox" data-complete>
+            <span>已领悟</span>
+          </label>
+          <button class="ghost" type="button" data-delete aria-label="删除毒舌">删除</button>
+        </div>
+      </div>
+      <p class="card__notes" data-notes></p>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
